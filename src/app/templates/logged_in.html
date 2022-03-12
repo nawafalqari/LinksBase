@@ -1,0 +1,531 @@
+{% extends 'base.html' %}
+{% block head %}
+<title>LinksBase - Your Links In One Place</title>
+<meta name="description" content="LinksBase - Your Links In One Place">
+<meta name="author" content="LinksBase">
+<meta name="theme-color" content="#007bff">
+{% endblock %}
+{% block body %}
+<div class="inputDiv container">
+  <style>
+    body {
+      background-color: rgb(0, 0, 34);
+      color: white;
+    }
+
+    nav {
+      padding-left: 0 !important;
+    }
+
+    .navbar-brand {
+      padding-bottom: 0.7rem !important;
+      padding-top: 0 !important
+    }
+
+    .navbar-brand img {
+      width: 100px;
+    }
+
+    .navbar-brand {
+      padding-bottom: 0.7rem !important;
+      padding-top: 0 !important
+    }
+
+    .navbar-brand img {
+      width: 100px;
+    }
+    
+    .logout-uname {
+      display: flex;
+      position: absolute;
+      right: 0;
+    }
+
+    @media (max-width: 992px) {
+      nav .logout-uname {
+        position: unset;
+        display: unset !important;
+        right: unset;
+      }
+    }
+
+    .current {
+      color: #0266d1
+    }
+
+    .title {
+      margin: 30px 0 10px;
+    }
+
+    .footer {
+      margin-top: 10px;
+    }
+
+    input,
+    input:focus,
+    .submit {
+      border-radius: 0;
+      outline: 3px solid #007bff;
+    }
+
+    nav {
+      padding: 0.5rem 1rem !important;
+      padding-left: 0 !important;
+
+    }
+
+    div.urls-container {
+      margin-top: 10px;
+    }
+
+    div.url {
+      background-color: white;
+      color: black;
+      border: solid 4px #007bff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px;
+      margin-bottom: 15px;
+    }
+
+    div.url h6 {
+      margin: 0;
+    }
+
+    div.url .tools .delete {
+      color: white;
+    }
+
+    div.url .tools i {
+      font-size: 10px;
+    }
+
+    div.url .tools a:hover {
+      color: white;
+      text-decoration: none;
+    }
+
+    .err {
+      margin-top: 10px;
+    }
+
+    .login-container .container * {
+      color: black;
+    }
+
+    .login-container {
+      margin: 10px auto !important;
+    }
+
+    .login-container:nth-child(3) {
+      display: flex;
+      justify-content: center;
+    }
+
+    input,
+    input:focus,
+    .login-btn,
+    .login-btn:focus {
+      outline: 3px solid #007bff !important;
+      border-radius: 0 !important;
+    }
+
+    .login-btn {
+      color: white !important;
+    }
+
+    .submit,
+    .submit:focus {
+      background-color: #007bff;
+      outline: none !important;
+      border-color: #007bff !important;
+      color: white;
+    }
+
+    form {
+      margin-top: 10px;
+    }
+
+    .data-inp,
+    .data-inp:focus {
+      width: 100%;
+      height: 100%;
+      border: none;
+      outline: none !important;
+    }
+
+    .icons-a i,
+    .icon-a svg {
+      color: #007bff !important;
+      transition: .3s;
+    }
+
+    .icons-a i:hover,
+    .icons-a svg:hover {
+      color: #0659b3 !important;
+    }
+
+    select {
+      background-color: rgb(0, 0, 34);
+      color: white;
+      padding: 5px;
+      width: 100%;
+    }
+
+    select:focus {
+      border: solid #007bff 1px;
+      outline: solid #007bff 1px;
+    }
+
+    .upload {
+      width: 100px;
+      position: relative;
+      margin: auto;
+    }
+
+    .upload img {
+      border-radius: 50%;
+    }
+
+    .upload .round {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: #00B4FF;
+      width: 32px;
+      height: 32px;
+      line-height: 33px;
+      text-align: center;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    .upload .round input[type="file"] {
+      position: absolute;
+      transform: scale(2);
+      opacity: 0;
+    }
+
+    input[type=file]::-webkit-file-upload-button {
+      cursor: pointer;
+    }
+
+    .qr-code img {
+      border: #007bff solid 4px;
+    }
+  </style>
+  <nav class="navbar navbar-expand-lg">
+    <a href="{{ url_for('index') }}" class="navbar-brand"><img src="{{ session['config']['cdn_url'] }}/media/transparent_full_width.png"
+        alt="logo-transparent"></a>
+
+    <div class="navbar-collapse">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link current" href="{{ url_for('index') }}">Home</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="{{ url_for('discover') }}">Discover</a>
+        </li>
+        <div class="logout-uname">
+          <li class="nav-item active">
+            <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+          </li>
+          <li class="nav-item active">
+            <span class="nav-link">{{ session['username'] }}</span>
+          </li>
+        </div>
+      </ul>
+    </div>
+  </nav>
+  <h3 class="title">LinksBase - Your Links In One Place</h3>
+  <div class="content">
+    Your Link: <a href="{{ session['data']['url'] }}" target="_blank">{{ session['data']['url'] }}</a>
+    <form method="POST" id="form" enctype="multipart/form-data">
+      <div class="form-group">
+        <div class="upload">
+          {% if session['isAvatar'] %}
+          <img id="avatar" src="{{ session['config']['cdn_url'] }}/avatars/{{ session['username'] }}" width="100"
+            height="100" alt="">
+          {% else %}
+          <img id="avatar" src="{{ url_for('static', filename='images/noavatar.png') }}" width="100" height="100"
+            alt="">
+          {% endif %}
+          <div class="round">
+            <input name="avatar" type="file" onchange="loadFile(event)" accept="image/png, image/jpg, image/jpeg">
+            <i class="fa fa-camera" style="color: #fff;"></i>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        {% if dc %}
+        <input type="text" class="form-control username description" value="{{ dc }}" name="description" maxlength="100"
+          autofocus>
+        {% else %}
+        <input type="text" class="form-control username description" value="{{ session['data']['description'] }}"
+          name="description" maxlength="100" autofocus>
+        {% endif %}
+      </div>
+      <table border="1"
+        style="background-color:white; border-collapse:collapse; border:3px solid #007bff; color:#000000; width:100%"
+        cellpadding="5" cellspacing="3">
+        <tr>
+          <td style="width: 0px;">
+            <a class="icons-a" href="https://youtube.com/" style="color: white;">
+              <i class="fab fa-youtube" style="font-size: 35px; color: #007bff;"></i>
+            </a>
+          </td>
+          <td>
+            {% if yt %}
+            <input type="text" value="{{ yt }}" class="data-inp" name="youtube">
+            {% else %}
+            <input type="text" value="{{ session['data']['youtube'] or 'https://' }}" class="data-inp" name="youtube">
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td style="width: 0px;">
+            <a class="icons-a" href="https://twitter.com/" style="color: white;">
+              <i class="fab fa-twitter" style="font-size: 35px; color: #007bff;"></i>
+            </a>
+          </td>
+          <td>
+            {% if tt %}
+            <input type="text" value="{{ tt }}" class="data-inp" name="twitter">
+            {% else %}
+            <input type="text" value="{{ session['data']['twitter'] or 'https://' }}" class="data-inp" name="twitter">
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td style="width: 0px;">
+            <a class="icons-a" href="https://instagram.com/" style="color: white;">
+              <i class="fab fa-instagram" style="font-size: 35px; color: #007bff;"></i>
+            </a>
+          </td>
+          <td>
+            {% if ig %}
+            <input type="text" value="{{ ig }}" class="data-inp" name="instagram">
+            {% else %}
+            <input type="text" value="{{ session['data']['instagram'] or 'https://' }}" class="data-inp"
+              name="instagram">
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td style="width: 0px;">
+            <a class="icons-a" href="https://tiktok.com/" style="color: white;">
+              <svg style="width: 35px;" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"
+                data-prefix="fab" data-icon="tiktok" class="svg-inline--fa fa-tiktok fa-w-14" role="img"
+                viewBox="0 0 448 512">
+                <path fill="#007bff"
+                  d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z" />
+              </svg>
+            </a>
+          </td>
+          <td>
+            {% if tk %}
+            <input type="text" value="{{ tk }}" class="data-inp" name="tiktok">
+            {% else %}
+            <input type="text" value="{{ session['data']['tiktok'] or 'https://' }}" class="data-inp" name="tiktok">
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td style="width: 0px;">
+            <a class="icons-a" href="https://twitch.com/" style="color: white;">
+              <i class="fab fa-twitch" style="font-size: 35px; color: #007bff;"></i>
+            </a>
+          </td>
+          <td>
+            {% if ttv %}
+            <input type="text" value="{{ ttv }}" class="data-inp" name="twitch">
+            {% else %}
+            <input type="text" value="{{ session['data']['twitch'] or 'https://' }}" class="data-inp" name="twitch">
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td style="width: 0px;">
+            {% if session['data']['other'] == '' %}
+            <a href="#" style="color: white;">
+              <svg style="width: 35px; color: #007bff;" aria-hidden="true" focusable="false" data-prefix="fas"
+                data-icon="link" class="svg-inline--fa fa-link fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 512 512">
+                <path fill="currentColor"
+                  d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z">
+                </path>
+              </svg>
+            </a>
+            {% else %}
+            <a href="{{ session['data']['other'] }}" style="color: white;">
+              <svg style="width: 35px; color: #007bff;" aria-hidden="true" focusable="false" data-prefix="fas"
+                data-icon="link" class="svg-inline--fa fa-link fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 512 512">
+                <path fill="currentColor"
+                  d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z">
+                </path>
+              </svg>
+            </a>
+            {% endif %}
+          </td>
+          <td>
+            {% if dc %}
+            <input type="text" value="{{ ot }}" class="data-inp" name="other">
+            {% else %}
+            <input type="text" value="{{ session['data']['other'] or 'https://' }}" class="data-inp" name="other">
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+      <span><small>Leave URL empty if you want to remove it</small></span>
+      <div class="" style="margin-top: 1rem;">
+        <select name="theme" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+          {% if session['data']['theme'] == 'LinksBase' %}
+          <option selected value="linksbase">LinksBase Main Theme</option>
+          {% else %}
+          <option selected value="linksbase">LinksBase Main Theme</option>
+          {% endif %}
+
+          <!--  -->
+
+          {% if session['data']['theme'] == 'light' %}
+          <option selected value="light">Light Theme</option>
+          {% else %}
+          <option value="light">Light Theme</option>
+          {% endif %}
+
+          <!--  -->
+
+          {% if session['data']['theme'] == 'green' %}
+          <option selected value="green">Green Theme</option>
+          {% else %}
+          <option value="green">Green Theme</option>
+          {% endif %}
+
+          <!--  -->
+
+          {% if session['data']['theme'] == 'orange' %}
+          <option selected value="orange">Orange Theme</option>
+          {% else %}
+          <option value="orange">Orange Theme</option>
+          {% endif %}
+
+          <!--  -->
+
+          {% if session['data']['theme'] == 'blue' %}
+          <option selected value="blue">Blue Theme</option>
+          {% else %}
+          <option value="blue">Blue Theme</option>
+          {% endif %}
+
+          <!--  -->
+
+          {% if session['data']['theme'] == 'red' %}
+          <option selected value="red">Red Theme</option>
+          {% else %}
+          <option value="red">Red Theme</option>
+          {% endif %}
+        </select>
+      </div>
+      <div id="msg">
+        <p style="color: var(--{{ msg_type }}); margin: 0;">{{ msg }}</p>
+      </div>
+      <div class="form-group">
+        <label for=""></label>
+        <button type="submit" class="form-control submit">Save Changes</button>
+      </div>
+      <div class="form-group">
+        <label for="qr-code">Your QR Code</label>
+        <div class="qr-code">
+          <img src="{{ session['config']['cdn_url'] }}/qrcodes/{{ session['username'] }}" alt="" width="300px">
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<style>
+  .accounts {
+    margin-bottom: 10px;
+  }
+
+  .accounts i {
+    font-size: 30px;
+    transition: 0.3s;
+    margin-left: 5px;
+  }
+
+  footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+  }
+
+  @media (max-width: 420px) {
+    footer {
+      flex-direction: column;
+    }
+  }
+</style>
+<div class="container">
+  <footer class="page-footer font-small blue">
+    <div class="footer-copyright py-3">© Copyright <a href="https://linksb.me/linksbase">LinksBase</a>. All Rights Reserved</div>
+    <div class="accounts">
+      <a href="https://discord.gg/4Hhaw5S2x3" target="_blank">
+        <i class="fab fa-discord"></i>
+      </a>
+      <a href="https://twitter.com/linksbase" target="_blank">
+        <i class="fab fa-twitter"></i>
+      </a>
+      <a href="https://github.com/nawafalqari/LinksBase" target="_blan">
+        <i class="fab fa-github"></i>
+      </a>
+
+    </div>
+  </footer>
+</div>
+<script>
+
+  var loadFile = function (event) {
+    var output = document.getElementById('avatar');
+    output.src = URL.createObjectURL(event.target.files[0]);
+    output.onload = function () {
+      URL.revokeObjectURL(output.src)
+    }
+  };
+
+  if ($('#msg p').text()) {
+    setTimeout(
+      () => {
+        $('#msg p').text('')
+      },
+      5000)
+  }
+
+  $('.form').on('submit', (e) => {
+    $.ajax({
+      type: 'POST',
+      url: '/',
+      data: {
+        description: $('input[name="description"]'),
+
+        youtube: $('input[name="youtube"]'),
+        twitter: $('input[name="twitter"]'),
+        instagram: $('input[name="instagram"]'),
+        tiktok: $('input[name="tiktok"]'),
+        twitch: $('input[name="twitch"]'),
+        other: $('input[name="other"]'),
+      },
+      success: () => {
+
+      },
+      error: () => {
+
+      }
+    })
+    e.preventDefault()
+  })
+</script>
+{% endblock %}

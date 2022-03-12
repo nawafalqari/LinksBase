@@ -1,0 +1,8 @@
+# files
+
+**/.env
+
+# folders
+
+venv/
+**/node_modules

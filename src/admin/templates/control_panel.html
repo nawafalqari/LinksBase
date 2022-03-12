@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  Control Panel
+  <form action="" method="POST" id="form" enctype="multipart/form-data">
+    <img src="" alt="loads when file is uploaded" id="image">
+    <div>
+      <label for="image">Upload image to database</label>
+      <input name="image" id="file_input" type="file" onchange="loadFile(event)" accept="image/png, image/jpg, image/jpeg" required>
+    </div>
+    <div>
+      <label for="filename">filename <small>(make sure file extension is right)</small></label>
+      <input type="text" id="fname_inp" name="filename" required placeholder="filename.ext">
+    </div>
+    <div>
+      <input type="submit">
+    </div>
+  </form>
+  <script>
+    var loadFile = function (event) {
+      var output = document.getElementById('image');
+      var inp = document.getElementById('file_input')
+      var fnameinp = document.getElementById('fname_inp')
+
+      var filename = inp.value.split('\\')[inp.value.split('\\').length - 1]
+      
+      fnameinp.value = filename
+
+      output.src = URL.createObjectURL(event.target.files[0]);
+      output.onload = function () {
+        URL.revokeObjectURL(output.src)
+      }
+    };
+  </script>
+</body>
+
+</html>

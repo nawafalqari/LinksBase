@@ -1,0 +1,14 @@
+{
+  "name": "linksbase_bot",
+  "version": "1.0.0",
+  "description": "LinksBase Official Bot",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "NawafAlqari",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^13.6.0"
+  }
+}
