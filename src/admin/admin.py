@@ -90,6 +90,18 @@ def remove_user_panel():
 
     return redirect('/')
 
+@app.route('/remove_user/<user>', methods=['GET', 'POST'])
+def remove_user(user):
+    if request.method == 'GET':
+        return redirect('/')
+    u = users.find_one({'username': user})
+
+    if not u:
+        return 'Invalid Username'
+    users.delete_one(u)
+
+    return redirect('/')
+
 @app.route('/verify_user', methods=['GET', 'POST'])
 def verify_user_panel():
     if request.method == 'GET':
@@ -107,20 +119,42 @@ def verify_user_panel():
     })
 
     return redirect('/')
-    
 
-@app.route('/remove_user/<user>', methods=['GET', 'POST'])
-def remove_user(user):
+@app.route('/set_evexsland_staff_user', methods=['GET', 'POST'])
+def set_evexsland_staff_user():
     if request.method == 'GET':
         return redirect('/')
-    u = users.find_one({'username': user})
+    
+    username = request.form.get('username')
+    u = users.find_one({'username': username})
 
     if not u:
-        return 'Invalid Username'
-    users.delete_one(u)
+        return 'Invaild Username'
+    users.update_one({'username': username}, {
+        '$set': {
+            'isEvexsLandStaff': True
+        }
+    })
 
     return redirect('/')
 
+@app.route('/unset_evexsland_staff_user', methods=['GET', 'POST'])
+def unset_evexsland_staff_user():
+    if request.method == 'GET':
+        return redirect('/')
+    
+    username = request.form.get('username')
+    u = users.find_one({'username': username})
+    
+    if not u:
+        return redirect('/')
+    users.update_one({'username': username}, {
+        '$unset': {
+            'isEvexsLandStaff': True
+        }
+    })
+
+    return redirect('/')
 
 @app.route('/api/repeated_users/<user>')
 def api_repeated_users(user):

@@ -14,7 +14,8 @@
     <img src="" alt="loads when file is uploaded" id="image">
     <div>
       <label for="image">Upload image to database</label>
-      <input name="image" id="file_input" type="file" onchange="loadFile(event)" accept="image/png, image/jpg, image/jpeg" required>
+      <input name="image" id="file_input" type="file" onchange="loadFile(event)"
+        accept="image/png, image/jpg, image/jpeg" required>
     </div>
     <div>
       <label for="filename">filename <small>(make sure file extension is right)</small></label>
@@ -48,6 +49,30 @@
       <input type="submit" value="Verify">
     </div>
   </form>
+  <hr>
+  <form action="set_evexsland_staff_user" method="POST">
+    <h3>Set a user as EvexsLand Staff</h3>
+    <p>This will give them "isEvexsStaff: true" in the database</p>
+    <p>Also a EvexsLand Staff badge in the ui</p>
+    <div>
+      <label for="username">username:</label>
+      <input type="text" name="username" required>
+    </div>
+    <div>
+      <input type="submit" value="Set">
+    </div>
+  </form>
+  <hr>
+  <form action="unset_evexsland_staff_user" method="POST">
+    <h3>Remove a user from EvexsLand Staff</h3>
+    <div>
+      <label for="username">username:</label>
+      <input type="text" name="username" required>
+    </div>
+    <div>
+      <input type="submit" value="Unset">
+    </div>
+  </form>
   <script>
     var loadFile = function (event) {
       var output = document.getElementById('image');
@@ -55,7 +80,7 @@
       var fnameinp = document.getElementById('fname_inp')
 
       var filename = inp.value.split('\\')[inp.value.split('\\').length - 1]
-      
+
       fnameinp.value = filename
 
       output.src = URL.createObjectURL(event.target.files[0]);

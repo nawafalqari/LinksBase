@@ -181,6 +181,9 @@
               {% if user.get('isVerified') == True %}
               <img src="{{ session['config']['cdn_url'] }}/media/verified_gold.png" alt="verified" style="width: 20px;height: 20px;margin: 0 5px 0 0px;" loading="lazy" title="Verified Badge">
               {% endif %}
+              {% if user.get('isEvexsLandStaff') %}
+              <img src="{{ session['config']['cdn_url'] }}/media/evexs.png" alt="verified" style="width: 30px;height: 30px;margin: 0 5px 0 0px;" loading="lazy" title="EvexsLand Staff Badge">
+              {% endif %}
               {{ user['username'] }}
             </h5>
             <p class="card-text">{{ user['description'] }}</p>

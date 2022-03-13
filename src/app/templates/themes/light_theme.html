@@ -21,7 +21,7 @@
     background-color: var(--bg);
   }
 
-  img {
+  .img-container img {
     border-radius: 50%;
     border: solid var(--mblue) 5px;
     border-radius: 50%;
@@ -95,7 +95,13 @@
       {% endif %}
     </div>
     <div class="text">
-      <h1>{{ udata['username'] }}</h1>
+      <h1>
+        {% if udata['isVerified'] %}
+        <img src="{{ session['config']['cdn_url'] }}/media/verified_gold.png" alt="Verified Badge"
+          title="Verified Badge" style="width: 30px;height: 30px;">
+        {% endif %}
+        {{ udata['username'] }}
+      </h1>
       <h5>{{ udata['description'] }}</h5>
     </div>
   </div>

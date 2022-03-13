@@ -528,6 +528,9 @@ def user(username):
         'hasAvatar': hasAvatar
     }
 
+    if u.get('isVerified') == True:
+        udata['isVerified'] = True
+
     increment_visits(username)
 
     if u['data']['theme'] == 'linksbase':
