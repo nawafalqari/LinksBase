@@ -175,8 +175,6 @@ def increment_visits(username):
     })
     return True
 
-increment_visits('nawaf')
-
 # today = datetime.datetime.now()
 # todaysFormat = [f'{today.month}-{today.day}-{today.year}']
 # daysRange = list(calendar.monthrange(today.year, today.month))

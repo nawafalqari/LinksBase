@@ -1,10 +1,11 @@
 from flask import Flask, jsonify, redirect, render_template, request, session
 from pymongo import MongoClient
 from dotenv import load_dotenv
-from os import getenv
+from os import abort, getenv
 from bcrypt import checkpw
 import datetime
 from json import loads, dumps
+from requests import get
 
 load_dotenv()
 
@@ -75,12 +76,47 @@ def control_panel():
         })
     return render_template('control_panel.html')
 
+@app.route('/remove_user', methods=['GET', 'POST'])
+def remove_user_panel():
+    if request.method == 'GET':
+        return redirect('/')
+
+    username = request.form.get('username')
+    u = users.find_one({'username': username})
+
+    if not u:
+        return 'Invalid Username'
+    users.delete_one(u)
+
+    return redirect('/')
+
+@app.route('/verify_user', methods=['GET', 'POST'])
+def verify_user_panel():
+    if request.method == 'GET':
+        return redirect('/')
+    
+    username = request.form.get('username')
+    u = users.find_one({'username': username})
+
+    if not u:
+        return 'Invalid Username'
+    users.update_one({'username': username}, {
+        '$set': {
+            'isVerified': True
+        }
+    })
+
+    return redirect('/')
+    
 
 @app.route('/remove_user/<user>', methods=['GET', 'POST'])
 def remove_user(user):
     if request.method == 'GET':
         return redirect('/')
     u = users.find_one({'username': user})
+
+    if not u:
+        return 'Invalid Username'
     users.delete_one(u)
 
     return redirect('/')

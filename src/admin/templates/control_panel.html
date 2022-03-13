@@ -24,6 +24,30 @@
       <input type="submit">
     </div>
   </form>
+  <hr>
+  <form action="remove_user" method="POST" id="banForm">
+    <h3>Ban a user</h3>
+    <div>
+      <label for="username">username:</label>
+      <input type="text" name="username" id="username" required>
+    </div>
+    <div>
+      <input type="submit" value="Ban">
+    </div>
+  </form>
+  <hr>
+  <form action="verify_user" method="POST">
+    <h3>Verify a user</h3>
+    <p>This will give them "isVerified: true" in the database</p>
+    <p>Also a verified badge in the ui</p>
+    <div>
+      <label for="username">username:</label>
+      <input type="text" name="username" required>
+    </div>
+    <div>
+      <input type="submit" value="Verify">
+    </div>
+  </form>
   <script>
     var loadFile = function (event) {
       var output = document.getElementById('image');
