@@ -80,11 +80,6 @@
       width: 250px;
     }
 
-    select:focus {
-      border: solid #007bff 1px;
-      outline: solid #007bff 1px;
-    }
-
     .cards {
       margin-top: 1rem;
     }
@@ -122,7 +117,7 @@
       border-color: #030305;
       font-weight: 600;
     }
-    
+
     .profile-btn:hover {
       color: #030305;
       background-color: #cabfbf !important;
@@ -141,6 +136,9 @@
           <a class="nav-link current" href="{{ url_for('discover') }}">Discover</a>
         </li>
         {% if session['isLogged'] %}
+        <li class="nav-item active">
+          <a class="nav-link" href="{{ url_for('statics') }}">Statics</a>
+        </li>
         <div class="logout-uname">
           <li class="nav-item active">
             <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
@@ -176,8 +174,8 @@
       {% for user in users%}
       <div class="col-12 col-md-6 col-lg-4" style="padding-bottom: 20px;">
         <div class="card">
-          <img class="card-img-top" src="{{ session['config']['cdn_url'] }}/avatars/{{ user['username'] }}"
-            alt="uimg" loading="lazy">
+          <img class="card-img-top" src="{{ session['config']['cdn_url'] }}/avatars/{{ user['username'] }}" alt="uimg"
+            loading="lazy">
           <div class="card-body">
             <h5 class="card-title">{{ user['username'] }}</h5>
             <p class="card-text">{{ user['description'] }}</p>
@@ -215,7 +213,8 @@
   </style>
   <div class="container">
     <footer class="page-footer font-small blue">
-      <div class="footer-copyright py-3">© Copyright <a href="https://linksb.me/linksbase">LinksBase</a>. All Rights Reserved
+      <div class="footer-copyright py-3">© Copyright <a href="https://linksb.me/linksbase">LinksBase</a>. All Rights
+        Reserved
       </div>
       <div class="accounts">
         <a href="https://discord.gg/4Hhaw5S2x3" target="_blank">

@@ -11,6 +11,10 @@ import os
 from PIL import Image
 import qrcode
 from mimetypes import MimeTypes
+import calendar
+from time import time
+from threading import Thread
+from time import sleep
 
 load_dotenv()
 
@@ -72,6 +76,121 @@ def clean_discover_data(data):
     nd = [l1, l2]
 
     return nd
+
+def get_day_index(l:list, day):
+    for i in range(0, len(l)):
+        if l[i][0] == day:
+            return i
+
+def increment_visits(username):
+    '''
+
+    Visits structer
+
+    ```py
+    [
+        [ "12-3-2022", 8 ],
+        [ "13-3-2022", 15 ],
+        [ "14-3-2022", 2 ],
+        [ "15-3-2022", 35 ],
+    ]
+    ```
+
+    date behavior
+
+    ```py
+    datetime.now().strftime('%m-%d-%Y')
+    ```
+
+    '''
+    u = users.find_one({'username': username})
+    today = datetime.datetime.now()
+    weekDayName = f'{datetime.datetime.now().strftime("%A")}'
+    
+    if not u:
+        return False
+    if (not u.get('visits_monthly')) and (not u.get('visits_weekly')):
+        todaysFormat = f'{today.month}-{today.day}-{today.year}'
+        daysRange = list(calendar.monthrange(today.year, today.month))
+        t = today.strptime(todaysFormat, '%m-%d-%Y')
+
+        weekStart = t - datetime.timedelta(days=t.weekday())
+        weekEnd = weekStart + datetime.timedelta(days=6)
+
+        weekStart = weekStart.strftime('%m-%d-%Y')
+        weekEnd = weekEnd.strftime('%m-%d-%Y')
+
+        daysRange[-1] += 1
+
+        _30_days = {
+            f'{d}': {
+                'date': f'{today.month}-{d}-{today.year}',
+                'visits': 0
+            }
+        for d in range(*daysRange) }
+        monthStart = _30_days[list(_30_days)[0]]['date']
+        monthEnd = _30_days[list(_30_days)[-1]]['date']
+        _30_days['month_start'] = monthStart
+        _30_days['month_end'] = monthEnd
+
+        weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+        week = {
+            f'{w}': {
+                'date': f'{w}',
+                'visits': 0
+            } for w in weekdays
+        }
+        week['week_start'] = weekStart
+        week['week_end'] = weekEnd
+
+        users.update_one({'username': username}, {
+            '$set': {
+                'visits_monthly': _30_days,
+                'visits_weekly': week
+            }
+        })
+
+        users.update_one({'username': username}, { '$inc': {
+                f'visits_monthly.{today.day}.visits': 1
+            } 
+        })
+
+        users.update_one({'username': username}, {
+            '$inc': {
+                f'visits_weekly.{weekDayName}.visits': 1
+            }
+        })
+        return True
+
+    users.update_one({'username': username}, { '$inc': {
+            f'visits_monthly.{today.day}.visits': 1
+        } 
+    })
+
+    users.update_one({'username': username}, {
+        '$inc': {
+            f'visits_weekly.{weekDayName}.visits': 1
+        }
+    })
+    return True
+
+increment_visits('nawaf')
+
+# today = datetime.datetime.now()
+# todaysFormat = [f'{today.month}-{today.day}-{today.year}']
+# daysRange = list(calendar.monthrange(today.year, today.month))
+
+# daysRange[-1] += 1
+
+# listt = [
+#     [f'{today.month}-{d}-{today.year}', 0] for d in range(*daysRange)
+# ]
+
+# index = get_day_index(listt, '3-30-2022')
+
+# print(index)
+# print(listt[index])
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -349,6 +468,45 @@ def termsofservices():
     session['config']['cdn_url'] = os.getenv('CDN_URL')
     return 'Terms Of Services'
 
+@app.route('/statics')
+def statics():
+    session['config'] = {}
+    session['config']['cdn_url'] = os.getenv('CDN_URL')
+
+    if not session.get('isLogged'):
+        return redirect(url_for('index'))
+
+    u = users.find_one({ 'username': session.get('username') })
+    visits_monthly = u.get('visits_monthly')
+    visits_weekly = u.get('visits_weekly')
+
+    if not visits_monthly or not visits_weekly:
+        increment_visits(session.get('username'))
+        u = users.find_one({ 'username': session.get('username') })
+        visits_monthly = u.get('visits_monthly')
+        visits_weekly = u.get('visits_weekly')
+    
+
+    del visits_monthly['month_start']
+    del visits_monthly['month_end']
+
+    del visits_weekly['week_start']
+    del visits_weekly['week_end']
+
+    monthly_labels = [visits_monthly[row]['date'] for row in visits_monthly]
+    monthly_values = [visits_monthly[row]['visits'] for row in visits_monthly]
+
+    weekly_labels = [visits_weekly[row]['date'] for row in visits_weekly]
+    weekly_values = [visits_weekly[row]['visits'] for row in visits_weekly]
+
+    
+    return render_template('statics.html',
+    monthly_labels=monthly_labels,
+    monthly_values=monthly_values,
+    weekly_labels=weekly_labels,
+    weekly_values=weekly_values,
+    session=session)
+
 @app.route('/<username>')
 def user(username):
     session['config'] = {}
@@ -371,6 +529,8 @@ def user(username):
         'data': u['data'],
         'hasAvatar': hasAvatar
     }
+
+    increment_visits(username)
 
     if u['data']['theme'] == 'linksbase':
         return render_template('themes/linksbase_main_theme.html', session=session, udata=udata)

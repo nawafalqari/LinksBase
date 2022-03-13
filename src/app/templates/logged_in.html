@@ -34,7 +34,7 @@
     .navbar-brand img {
       width: 100px;
     }
-    
+
     .logout-uname {
       display: flex;
       position: absolute;
@@ -216,8 +216,8 @@
     }
   </style>
   <nav class="navbar navbar-expand-lg">
-    <a href="{{ url_for('index') }}" class="navbar-brand"><img src="{{ session['config']['cdn_url'] }}/media/transparent_full_width.png"
-        alt="logo-transparent"></a>
+    <a href="{{ url_for('index') }}" class="navbar-brand"><img
+        src="{{ session['config']['cdn_url'] }}/media/transparent_full_width.png" alt="logo-transparent"></a>
 
     <div class="navbar-collapse">
       <ul class="navbar-nav">
@@ -226,6 +226,9 @@
         </li>
         <li class="nav-item active">
           <a class="nav-link" href="{{ url_for('discover') }}">Discover</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="{{ url_for('statics') }}">Statics</a>
         </li>
         <div class="logout-uname">
           <li class="nav-item active">
@@ -471,7 +474,8 @@
 </style>
 <div class="container">
   <footer class="page-footer font-small blue">
-    <div class="footer-copyright py-3">© Copyright <a href="https://linksb.me/linksbase">LinksBase</a>. All Rights Reserved</div>
+    <div class="footer-copyright py-3">© Copyright <a href="https://linksb.me/linksbase">LinksBase</a>. All Rights
+      Reserved</div>
     <div class="accounts">
       <a href="https://discord.gg/4Hhaw5S2x3" target="_blank">
         <i class="fab fa-discord"></i>
