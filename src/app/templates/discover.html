@@ -63,6 +63,11 @@
       outline: 3px solid #007bff;
     }
 
+    select:focus {
+      border: solid #007bff 1px;
+      outline: solid #007bff 1px;
+    }
+
     nav {
       padding: 0.5rem 1rem !important;
       padding-left: 0 !important;
@@ -122,6 +127,19 @@
       color: #030305;
       background-color: #cabfbf !important;
     }
+
+    .profile-btn:focus {
+      background-color: #cabfbf !important;
+      color: #030305 !important;
+    }
+
+    .profile-btn:active {
+      color: #030305 !important;
+    }
+
+    .verified-users {
+      display: none;
+    }
   </style>
   <nav class="navbar navbar-expand-lg">
     <a href="{{ url_for('index') }}" class="navbar-brand"><img
@@ -160,40 +178,78 @@
   </nav>
   <h3 class="title">LinksBase - Discover</h3>
   <p>Discover users from all the world</p>
-  <select name="filter" style="margin-top: 1rem;">
+  <select name="filter" style="margin-top: 1rem;" id="filter">
     <option value="new" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" selected>
       New Users
+    </option>
+    <option value="verified" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+      Verified Users
     </option>
     <option value="most" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" disabled>
       Most Popular (soon)
     </option>
   </select>
-  <div class="cards">
-    {% for users in users_data %}
-    <div class="row">
-      {% for user in users %}
-      <div class="col-12 col-md-6 col-lg-4" style="padding-bottom: 20px;">
-        <div class="card">
-          <img class="card-img-top" src="{{ session['config']['cdn_url'] }}/avatars/{{ user['username'] }}" alt="uimg"
-            loading="lazy">
-          <div class="card-body">
-            <h5 class="card-title">
-              {% if user.get('isVerified') == True %}
-              <img src="{{ session['config']['cdn_url'] }}/media/verified_gold.png" alt="verified" style="width: 20px;height: 20px;margin: 0 5px 0 0px;" loading="lazy" title="Verified Badge">
-              {% endif %}
-              {% if user.get('isEvexsLandStaff') %}
-              <img src="{{ session['config']['cdn_url'] }}/media/evexs.png" alt="verified" style="width: 30px;height: 30px;margin: 0 5px 0 0px;" loading="lazy" title="EvexsLand Staff Badge">
-              {% endif %}
-              {{ user['username'] }}
-            </h5>
-            <p class="card-text">{{ user['description'] }}</p>
-            <a href="{{ user['url'] }}" class="btn btn-primary profile-btn" target="_blank">Profile</a>
+  <div class="new-users">
+    <div class="cards">
+      {% for users in users_data %}
+      <div class="row">
+        {% for user in users %}
+        <div class="col-12 col-md-6 col-lg-4" style="padding-bottom: 20px;">
+          <div class="card">
+            <img class="card-img-top" src="{{ session['config']['cdn_url'] }}/avatars/{{ user['username'] }}" alt="uimg"
+              loading="lazy">
+            <div class="card-body">
+              <h5 class="card-title">
+                {% if user.get('isVerified') == True %}
+                <img src="{{ session['config']['cdn_url'] }}/media/verified_gold.png" alt="verified"
+                  style="width: 20px;height: 20px;margin: 0 5px 0 0px;" loading="lazy" title="Verified Badge">
+                {% endif %}
+                {% if user.get('isEvexsLandStaff') %}
+                <img src="{{ session['config']['cdn_url'] }}/media/evexs.png" alt="verified"
+                  style="width: 30px;height: 30px;margin: 0 5px 0 0px;" loading="lazy" title="EvexsLand Staff Badge">
+                {% endif %}
+                {{ user['username'] }}
+              </h5>
+              <p class="card-text">{{ user['description'] }}</p>
+              <a href="{{ user['url'] }}" class="btn btn-primary profile-btn" target="_blank">Profile</a>
+            </div>
           </div>
         </div>
+        {% endfor %}
       </div>
       {% endfor %}
     </div>
-    {% endfor %}
+  </div>
+  <div class="verified-users">
+    <div class="cards">
+      {% for users in verified_users %}
+      <div class="row">
+        {% for user in users %}
+        <div class="col-12 col-md-6 col-lg-4" style="padding-bottom: 20px;">
+          <div class="card">
+            <img class="card-img-top" src="{{ session['config']['cdn_url'] }}/avatars/{{ user['username'] }}" alt="uimg"
+              loading="lazy">
+            <div class="card-body">
+              <h5 class="card-title">
+                {% if user.get('isVerified') == True %}
+                <img src="{{ session['config']['cdn_url'] }}/media/verified_gold.png" alt="verified"
+                  style="width: 20px;height: 20px;margin: 0 5px 0 0px;" loading="lazy" title="Verified Badge">
+                {% endif %}
+                {% if user.get('isEvexsLandStaff') %}
+                <img src="{{ session['config']['cdn_url'] }}/media/evexs.png" alt="verified"
+                  style="width: 30px;height: 30px;margin: 0 5px 0 0px;" loading="lazy" title="EvexsLand Staff Badge">
+                {% endif %}
+                {{ user['username'] }}
+              </h5>
+              <p class="card-text">{{ user['description'] }}</p>
+              <a href="{{ user['url'] }}" class="btn btn-primary profile-btn" target="_blank">Profile</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
   </div>
   <style>
     .accounts {
@@ -237,4 +293,22 @@
       </div>
     </footer>
   </div>
+  <script>
+    $('#filter').on('change', function (e) {
+      var optionSelected = $("option:selected", this);
+      var valueSelected = this.value;
+
+      var new_users = document.querySelector('.new-users')
+      var verified_users = document.querySelector('.verified-users')
+
+      if (valueSelected === 'verified') {
+        new_users.style.display = 'none'
+        verified_users.style.display = 'unset'
+
+      } else if (valueSelected === 'new') {
+        new_users.style.display = 'unset'
+        verified_users.style.display = 'none'
+      }
+    })
+  </script>
   {% endblock %}

@@ -15,6 +15,7 @@ import calendar
 from time import time
 from threading import Thread
 from time import sleep
+from collections import OrderedDict
 
 load_dotenv()
 
@@ -70,10 +71,15 @@ def clean_discover_data(data):
         i['url'] = i['data']['url']
         del i['data']
 
-    mid = len(d) // 2
-    l1 = d[0:mid]
-    l2 = d[mid:]
-    nd = [l1, l2]
+    nd = []
+
+    for i in range(0, len(d), 3):
+        nd.append(d[i:i+3])
+
+    # mid = len(d) // 2
+    # l1 = d[0:mid]
+    # l2 = d[mid:]
+    # nd = [l1, l2]
 
     return nd
 
@@ -450,9 +456,11 @@ def discover():
     users_length = users.count_documents({})
     wanted_number_of_users = users_length
     users_data = list(reversed(list(users.find({}, skip=(users_length - wanted_number_of_users)))))
-    cleaned_data = list(clean_discover_data(users_data))
+    cleaned_data = clean_discover_data(users_data)
 
-    return render_template('discover.html', users_data=cleaned_data, session=session)
+    verified_users = clean_discover_data(list(users.find({'isVerified': True})))
+
+    return render_template('discover.html', users_data=cleaned_data, verified_users=verified_users, session=session)
 
 @app.route('/tos')
 def tos():
