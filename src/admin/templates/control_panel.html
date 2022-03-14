@@ -50,6 +50,19 @@
     </div>
   </form>
   <hr>
+  <form action="unverify_user" method="POST">
+    <h3>Unverify a user</h3>
+    <p>This will unset "isVerified: true" from the database</p>
+    <p>Also remove verified badge in the ui</p>
+    <div>
+      <label for="username">username:</label>
+      <input type="text" name="username" required>
+    </div>
+    <div>
+      <input type="submit" value="Unverify">
+    </div>
+  </form>
+  <hr>
   <form action="set_evexsland_staff_user" method="POST">
     <h3>Set a user as EvexsLand Staff</h3>
     <p>This will give them "isEvexsStaff: true" in the database</p>
