@@ -507,7 +507,6 @@ def statics():
 
     weekly_labels = [visits_weekly[row]['date'] for row in visits_weekly]
     weekly_values = [visits_weekly[row]['visits'] for row in visits_weekly]
-
     
     return render_template('statics.html',
     monthly_labels=monthly_labels,
