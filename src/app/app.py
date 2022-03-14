@@ -484,12 +484,15 @@ def statics():
         visits_monthly = u.get('visits_monthly')
         visits_weekly = u.get('visits_weekly')
     
+    if visits_monthly.get('month_start'):
+        del visits_monthly['month_start']
+    if visits_monthly.get('month_end'):
+        del visits_monthly['month_end']
 
-    del visits_monthly['month_start']
-    del visits_monthly['month_end']
-
-    del visits_weekly['week_start']
-    del visits_weekly['week_end']
+    if visits_weekly.get('week_start'):
+        del visits_weekly['week_start']
+    if visits_weekly.get('week_start'):
+        del visits_weekly['week_end']
 
     monthly_labels = [visits_monthly[row]['date'] for row in visits_monthly]
     monthly_values = [visits_monthly[row]['visits'] for row in visits_monthly]
