@@ -63,6 +63,32 @@
     </div>
   </form>
   <hr>
+  <form action="set_donator" method="POST">
+    <h3>Set a donator</h3>
+    <p>This will set "isDonator: true" in the database</p>
+    <p>Also give them donator badge in the ui</p>
+    <div>
+      <label for="username">username:</label>
+      <input type="text" name="username" required>
+    </div>
+    <div>
+      <input type="submit" value="set Donator">
+    </div>
+  </form>
+  <hr>
+  <form action="unset_donator" method="POST">
+    <h3>Unset a donator</h3>
+    <p>This will unset "isDonator: true" from the database</p>
+    <p>Also remove donator badge in the ui</p>
+    <div>
+      <label for="username">username:</label>
+      <input type="text" name="username" required>
+    </div>
+    <div>
+      <input type="submit" value="unset Donator">
+    </div>
+  </form>
+  <hr>
   <form action="set_evexsland_staff_user" method="POST">
     <h3>Set a user as EvexsLand Staff</h3>
     <p>This will give them "isEvexsStaff: true" in the database</p>

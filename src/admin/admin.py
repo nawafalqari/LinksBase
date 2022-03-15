@@ -138,6 +138,42 @@ def unverify_user_panel():
 
     return redirect('/')
 
+@app.route('/set_donator', methods=['GET', 'POST'])
+def set_donator_panel():
+    if request.method == 'GET':
+        return redirect('/')
+    
+    username = request.form.get('username')
+    u = users.find_one({'username': username})
+
+    if not u:
+        return 'Invalid Username'
+    users.update_one({'username': username}, {
+        '$set': {
+            'isDonator': True
+        }
+    })
+
+    return redirect('/')
+
+@app.route('/unset_donator', methods=['GET', 'POST'])
+def unset_donator_panel():
+    if request.method == 'GET':
+        return redirect('/')
+    
+    username = request.form.get('username')
+    u = users.find_one({'username': username})
+
+    if not u:
+        return 'Invalid Username'
+    users.update_one({'username': username}, {
+        '$unset': {
+            'isDonator': True
+        }
+    })
+
+    return redirect('/')
+
 @app.route('/set_evexsland_staff_user', methods=['GET', 'POST'])
 def set_evexsland_staff_user():
     if request.method == 'GET':

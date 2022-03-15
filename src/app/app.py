@@ -219,6 +219,34 @@ def index():
         other = request.form.get('other')
         theme = request.form.get('theme')
 
+        user = users.find_one({'username': session.get('username')})
+
+        if avatar:
+            fn = secure_filename(avatar.filename)
+            extensions = ['png', 'jpg', 'jpeg']
+            avatar_extension = fn.split('.')[-1]
+
+            if avatar_extension not in extensions:
+                return render_template('logged_in.html',
+                                       session=session,
+                                       msg='Invalid file extension',
+                                       msg_type='danger',
+                                       dc=description,
+                                       yt=youtube,
+                                       tt=twitter,
+                                       ig=instagram,
+                                       tk=tiktok,
+                                       ttv=twitch,
+                                       ot=other)
+
+            users.update_one(user, {
+                '$set': {'avatar': {
+                    'img': avatar.stream.read(),
+                    'mimetype': avatar.mimetype,
+                    'filename': fn
+                }}
+            })
+
         if (not validators.url(youtube) and (youtube != 'https://' and youtube != '')) or \
             (not validators.url(twitter) and (twitter != 'https://' and twitter != '')) or \
             (not validators.url(instagram) and (instagram != 'https://' and instagram != '')) or \
@@ -254,32 +282,6 @@ def index():
                 }
             }
         })
-
-        if avatar:
-            fn = secure_filename(avatar.filename)
-            extensions = ['png', 'jpg', 'jpeg']
-            avatar_extension = fn.split('.')[-1]
-
-            if avatar_extension not in extensions:
-                return render_template('logged_in.html',
-                                       session=session,
-                                       msg='Invalid file extension',
-                                       msg_type='danger',
-                                       dc=description,
-                                       yt=youtube,
-                                       tt=twitter,
-                                       ig=instagram,
-                                       tk=tiktok,
-                                       ttv=twitch,
-                                       ot=other)
-
-            users.update_one(user, {
-                '$set': {'avatar': {
-                    'img': avatar.stream.read(),
-                    'mimetype': avatar.mimetype,
-                    'filename': fn
-                }}
-            })
 
         user = users.find_one({'username': session.get('username')})
         session['data'] = user['data']
@@ -499,7 +501,7 @@ def statics():
 
     if visits_weekly.get('week_start'):
         del visits_weekly['week_start']
-    if visits_weekly.get('week_start'):
+    if visits_weekly.get('week_end'):
         del visits_weekly['week_end']
 
     monthly_labels = [visits_monthly[row]['date'] for row in visits_monthly]
@@ -535,11 +537,13 @@ def user(username):
         'avatar': f'{session["config"]["cdn_url"]}/avatars/{u["username"]}',
         'registered_in': u['registered_in'],
         'data': u['data'],
-        'hasAvatar': hasAvatar
+        'hasAvatar': hasAvatar,
     }
 
     if u.get('isVerified') == True:
         udata['isVerified'] = True
+    if u.get('isDonator') == True:
+        udata['isDonator'] = True
 
     increment_visits(username)
 
