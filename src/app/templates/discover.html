@@ -141,7 +141,8 @@
       color: #030305 !important;
     }
 
-    .verified-users {
+    .verified-users,
+    .donators {
       display: none;
     }
   </style>
@@ -189,6 +190,9 @@
     <option value="verified" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
       Verified Users
     </option>
+    <option value="donators" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+      Donators
+    </option>
     <option value="most" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" disabled>
       Most Popular (soon)
     </option>
@@ -204,6 +208,10 @@
               loading="lazy">
             <div class="card-body">
               <h5 class="card-title">
+                {% if user.get('isDonator') == True %}
+                <img src="{{ session['config']['cdn_url'] }}/media/donator.png" alt="Donator"
+                  style="width: 20px;height: 20px;margin: 0 5px 0 0px;" loading="lazy" title="Donator Badge">
+                {% endif %}
                 {% if user.get('isVerified') == True %}
                 <img src="{{ session['config']['cdn_url'] }}/media/verified_gold.png" alt="verified"
                   style="width: 20px;height: 20px;margin: 0 5px 0 0px;" loading="lazy" title="Verified Badge">
@@ -235,12 +243,51 @@
               loading="lazy">
             <div class="card-body">
               <h5 class="card-title">
+                {% if user.get('isDonator') == True %}
+                <img src="{{ session['config']['cdn_url'] }}/media/donator.png" alt="Donator"
+                  style="width: 20px;height: 20px;margin: 0 5px 0 0px;" loading="lazy" title="Donator Badge">
+                {% endif %}
                 {% if user.get('isVerified') == True %}
                 <img src="{{ session['config']['cdn_url'] }}/media/verified_gold.png" alt="verified"
                   style="width: 20px;height: 20px;margin: 0 5px 0 0px;" loading="lazy" title="Verified Badge">
                 {% endif %}
                 {% if user.get('isEvexsLandStaff') %}
                 <img src="{{ session['config']['cdn_url'] }}/media/evexs.png" alt="verified"
+                  style="width: 30px;height: 30px;margin: 0 5px 0 0px;" loading="lazy" title="EvexsLand Staff Badge">
+                {% endif %}
+                {{ user['username'] }}
+              </h5>
+              <p class="card-text">{{ user['description'] }}</p>
+              <a href="{{ user['url'] }}" class="btn btn-primary profile-btn" target="_blank">Profile</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="donators">
+    <div class="cards">
+      {% for users in donators %}
+      <div class="row">
+        {% for user in users %}
+        <div class="col-12 col-md-6 col-lg-4" style="padding-bottom: 20px;">
+          <div class="card">
+            <img class="card-img-top" src="{{ session['config']['cdn_url'] }}/avatars/{{ user['username'] }}" alt="uimg"
+              loading="lazy">
+            <div class="card-body">
+              <h5 class="card-title">
+                {% if user.get('isDonator') == True %}
+                <img src="{{ session['config']['cdn_url'] }}/media/donator.png" alt="donator"
+                  style="width: 20px;height: 20px;margin: 0 5px 0 0px;" loading="lazy" title="Donator Badge">
+                {% endif %}
+                {% if user.get('isVerified') == True %}
+                <img src="{{ session['config']['cdn_url'] }}/media/verified_gold.png" alt="verified"
+                  style="width: 20px;height: 20px;margin: 0 5px 0 0px;" loading="lazy" title="Verified Badge">
+                {% endif %}
+                {% if user.get('isEvexsLandStaff') %}
+                <img src="{{ session['config']['cdn_url'] }}/media/evexs.png" alt="EvexsLand"
                   style="width: 30px;height: 30px;margin: 0 5px 0 0px;" loading="lazy" title="EvexsLand Staff Badge">
                 {% endif %}
                 {{ user['username'] }}
@@ -286,14 +333,22 @@
 
       var new_users = document.querySelector('.new-users')
       var verified_users = document.querySelector('.verified-users')
+      var donators = document.querySelector('.donators')
 
       if (valueSelected === 'verified') {
         new_users.style.display = 'none'
         verified_users.style.display = 'unset'
+        donators.style.display = 'none'
+        
+      } else if(valueSelected === 'donators') {
+        new_users.style.display = 'none'
+        verified_users.style.display = 'none'
+        donators.style.display = 'unset'
 
       } else if (valueSelected === 'new') {
         new_users.style.display = 'unset'
         verified_users.style.display = 'none'
+        donators.style.display = 'none'
       }
     })
   </script>

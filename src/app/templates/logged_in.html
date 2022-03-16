@@ -143,6 +143,10 @@
       color: white;
     }
 
+    a:has(.submit) {
+      color: red !important;
+    }
+
     form {
       margin-top: 10px;
     }
@@ -218,6 +222,77 @@
     .upload img {
       object-fit: cover;
     }
+
+    /* Custom theme styling */
+    .custom-theme-container > label {
+      display: flex;
+      align-items: center;
+    }
+
+    .custom-theme-container span {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      background-color: #0058b6;
+      padding: 11px 5px;
+      border-radius: 16px;
+      margin-left: 4px;
+      height: 18px;
+    }
+
+    .custom-theme-container span img {
+      margin-right: 3px;
+    }
+
+    input[type="color"] {
+      border: none !important;
+      outline: none !important;
+      cursor: pointer;
+      background-color: unset;
+    }
+
+    .color-container {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .color-container input[type="color"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 100px;
+      height: 100px;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+    }
+
+    .color-container label {
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .color-container input[type="color"]::-webkit-color-swatch {
+      border-radius: 15px;
+      border: none;
+    }
+    .color-container input[type="color"]::-moz-color-swatch {
+      border-radius: 15px;
+      border: none;
+    }
+
+    .color-container input[type="color"]:disabled {
+      opacity: 40%;
+    }
+
+    .color-container input[type="color"]:disabled + label {
+      opacity: 40%;
+    }
+
+    .become-donator:hover {
+      text-decoration: none;
+    }
   </style>
   <nav class="navbar navbar-expand-lg">
     <a href="{{ url_for('index') }}" class="navbar-brand"><img
@@ -251,7 +326,7 @@
     <form method="POST" id="form" enctype="multipart/form-data">
       <div class="form-group">
         <div class="upload">
-          {% if session['isAvatar'] %}
+          {% if session['isAvatar'] == True %}
           <img id="avatar" src="{{ session['config']['cdn_url'] }}/avatars/{{ session['username'] }}" width="100"
             height="100" alt="">
           {% else %}
@@ -259,7 +334,12 @@
             alt="">
           {% endif %}
           <div class="round">
+            {% if session['isDonator'] == True %}
             <input name="avatar" type="file" onchange="loadFile(event)" accept="image/png, image/jpg, image/jpeg">
+            {% else %}
+            <input name="avatar" type="file" onchange="loadFile(event)"
+              accept="image/png, image/jpg, image/jpeg, image/gif">
+            {% endif %}
             <i class="fa fa-camera" style="color: #fff;"></i>
           </div>
         </div>
@@ -388,7 +468,8 @@
       </table>
       <span><small>Leave URL empty if you want to remove it</small></span>
       <div class="" style="margin-top: 1rem;">
-        <select name="theme" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+        <select name="theme" class="form-select form-select-lg mb-3" id="theme-select"
+          aria-label=".form-select-lg example">
           {% if session['data']['theme'] == 'LinksBase' %}
           <option selected value="linksbase">LinksBase Main Theme</option>
           {% else %}
@@ -434,6 +515,26 @@
           {% else %}
           <option value="red">Red Theme</option>
           {% endif %}
+
+          <!--  -->
+
+          {% if session['data']['theme'] == 'dark_blue' %}
+          <option selected value="dark_blue">Dark Blue Theme</option>
+          {% else %}
+          <option value="dark_blue">Dark Blue Theme</option>
+          {% endif %}
+
+          <!-- donators custom theme -->
+
+          {% if session.get('isDonator') == True %}
+            {% if session['data']['theme'] == 'custom' %}
+            <option selected value="custom">Custom Theme</option>
+            {% else %}
+            <option value="custom">Custom Theme</option>
+            {% endif %}
+          {% else %}
+            <option value="custom" disabled>Custom Theme</option>
+          {% endif %}
         </select>
       </div>
       <div id="msg">
@@ -443,13 +544,56 @@
         <label for=""></label>
         <button type="submit" class="form-control submit">Save Changes</button>
       </div>
+      <!-- <div class="show_theme">
+        <iframe src="https://linksb.me/{{ session.get('username') }}" id="iframe" frameborder="0" style="width: 100%;height: 500px;"></iframe>
+      </div> -->
+    </form>
+    <form action="save_custom_theme" method="POST">
       <div class="form-group">
-        <label for="qr-code">Your QR Code</label>
-        <div class="qr-code">
-          <img src="{{ session['config']['cdn_url'] }}/qrcodes/{{ session['username'] }}" alt="" width="300px">
+        <div class="custom-theme-container">
+          <label for="custom-theme">Custom Theme <span title="For Donators Only"><img
+                src="{{ session['config']['cdn_url'] }}/media/donator.png" alt="Donator" width="16px" height="16px">
+              Donator</span></label>
+          <div class="pickers">
+            <div class="color-container">
+              {% if session.get('isDonator') == True %}
+              <input type="color" name="main_color" title="Main Color" value="{{ main_color or '#d90429' }}">
+              {% else %}
+              <input type="color" name="main_color" title="Main Color" value="{{ main_color or '#d90429' }}" disabled>
+              {% endif %}
+              <label for="main_color">Main Color</label>
+            </div>
+            <div class="color-container">
+              {% if session.get('isDonator') == True %}
+              <input type="color" name="background_color" title="Background Color" value="{{ background_color or '#edf2f4' }}">
+              {% else %}
+              <input type="color" name="background_color" title="Background Color" value="{{ background_color or '#edf2f4' }}" disabled>
+              {% endif %}
+              <label for="backgournd_color">Background Color</label>
+            </div>
+            <div class="color-container">
+              {% if session.get('isDonator') == True %}
+              <input type="color" name="text_color" title="Text Color" value="{{ text_color or '#293241' }}">
+              {% else %}
+              <input type="color" name="text_color" title="Text Color" value="{{ text_color or '#293241' }}" disabled>
+              {% endif %}
+              <label for="text_color">Text Color</label>
+            </div>
+          </div>
         </div>
       </div>
+      <div class="form-group">
+        {% if session.get('isDonator') == True %}
+        <button type="submit" class="form-control submit">Save Custom Theme</button>
+        {% else %}
+        <a href="https://www.patreon.com/nawafalqari" class="become-donator"><button class="form-control submit">Become a donator</button></a>
+        {% endif %}
+      </div>
     </form>
+    <label for="qr-code">Your QR Code</label>
+    <div class="qr-code">
+      <img src="{{ session['config']['cdn_url'] }}/qrcodes/{{ session['username'] }}" alt="" width="300px">
+    </div>
   </div>
 </div>
 <style>
@@ -477,6 +621,36 @@
   }
 </style>
 <script>
+  /*
+  var iframe = $('#iframe')
+  iframe.on('load', function() {
+    iframe.remove('#footer')
+  })
+  
+  $('#theme-select').on('change', function(e) {
+    var iframe = $('#iframe')
+    var optionSelected = $("option:selected", this);
+    var valueSelected = this.value;
+
+    var values = {
+      linksbase: 'linksbase_main_theme',
+      light: 'light_theme',
+      green: 'green_theme',
+      orange: 'orange_theme',
+      blue: 'blue_theme',
+      red: 'red_theme',
+    }
+
+    val = values[valueSelected]
+    iframe.attr('src', `https://linksb.me/show_theme/${val}/{{ session.get('username') }}`)
+    
+    iframe.on('load', function() {
+      console.log(iframe.contents().find('.f'))
+    })
+
+  })
+  */
+  window.history.pushState("object or string", "Title", "/" + window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]);
 
   var loadFile = function (event) {
     var output = document.getElementById('avatar');

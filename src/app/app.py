@@ -200,10 +200,21 @@ def increment_visits(username):
 def index():
     session['config'] = {}
     session['config']['cdn_url'] = os.getenv('CDN_URL')
+
+    if request.args.get('msg') and request.args.get('msg_type') and request.args.get('route') == 'save_custom_theme' and session.get('isLogged'):
+        user = users.find_one({'username': session.get('username')})
+        session['data'] = user['data']
+        return render_template('logged_in.html',
+        msg=request.args.get('msg'),
+        msg_type=request.args.get('msg_type'),
+        main_color= user.get('main_color'),
+        background_color=user.get('background_color'),
+        text_color=user.get('text_color'),
+        session=session)
     if request.args.get('msg') and request.args.get('msg_type') and session.get('isLogged'):
         user = users.find_one({'username': session.get('username')})
         session['data'] = user['data']
-        return render_template('logged_in.html', msg=request.args.get('msg'), msg_type=request.args.get('msg_type'))
+        return render_template('logged_in.html', msg=request.args.get('msg'), msg_type=request.args.get('msg_type'), session=session)
 
     # SAVE DATA
 
@@ -225,6 +236,23 @@ def index():
             fn = secure_filename(avatar.filename)
             extensions = ['png', 'jpg', 'jpeg']
             avatar_extension = fn.split('.')[-1]
+
+            if user.get('isDonator') == True:
+                extensions.append('gif')
+                session['isDonator'] = True
+
+            if (not session.get('isDonator')) and (avatar_extension == 'gif'):
+                return render_template('logged_in.html',
+                                       session=session,
+                                       msg='Animated avatars are just for patreon donators',
+                                       msg_type='danger',
+                                       dc=description,
+                                       yt=youtube,
+                                       tt=twitter,
+                                       ig=instagram,
+                                       tk=tiktok,
+                                       ttv=twitch,
+                                       ot=other)
 
             if avatar_extension not in extensions:
                 return render_template('logged_in.html',
@@ -290,7 +318,25 @@ def index():
         else:
             session['isAvatar'] = False
 
-        return render_template('logged_in.html', session=session, msg='Changes are saved!', msg_type='success')
+        if user.get('isDonator') == True:
+            session['isDonator'] = True
+
+        if user.get('isDonator') == True:
+            return render_template('logged_in.html', 
+            session=session,
+            msg='Changes are saved!',
+            msg_type='success',
+            main_color= user.get('main_color'),
+            background_color=user.get('background_color'),
+            text_color=user.get('text_color'))
+
+        return render_template('logged_in.html',
+        session=session,
+        msg='Changes are saved!',
+        msg_type='success',
+        main_color= user.get('main_color'),
+        background_color=user.get('background_color'),
+        text_color=user.get('text_color'))
 
     if session.get('isLogged'):
         user = users.find_one({'username': session.get('username')})
@@ -299,11 +345,76 @@ def index():
             session['isAvatar'] = True
         else:
             session['isAvatar'] = False
-        return render_template('logged_in.html', session=session)
+
+        if user.get('isDonator') == True:
+            session['isDonator'] = True
+
+        return render_template('logged_in.html',
+        session=session,
+        main_color= user.get('main_color'),
+        background_color=user.get('background_color'),
+        text_color=user.get('text_color'))
 
     # return redirect('login')
     return render_template('not_logged_in.html')
 
+@app.route('/save_custom_theme', methods=['GET', 'POST'])
+def save_custom_theme():
+    if request.method == 'GET':
+        return redirect('/')
+    if not session.get('isLogged'):
+        return redirect('/')
+    
+    u = users.find_one({'username': session.get('username')})
+    if not u.get('isDonator') == True:
+        return render_template('logged_in.html', msg='Custom themes are only for donators', msg_type='danger')
+
+    main_color = request.form.get('main_color')
+    background_color = request.form.get('background_color')
+    text_color = request.form.get('text_color')
+
+    users.update_one({'username': session.get('username')}, {
+        '$set': {
+            'main_color': main_color,
+            'background_color': background_color,
+            'text_color': text_color
+        }
+    })
+
+    return redirect(url_for('index',
+    route='save_custom_theme',
+    msg='Custom theme was saved, note: You need to set the theme to "custom theme"',
+    msg_type='success'))
+
+@app.route('/show_theme/<theme>/<username>')
+def save_theme(theme, username):
+    session['config'] = {}
+    session['config']['cdn_url'] = os.getenv('CDN_URL')
+    
+    u = users.find_one({'username': username})
+
+    if not u:
+        return abort(404)
+
+    hasAvatar = False
+    if not (u.get('avatar') == 'noavatar.png'):
+        hasAvatar = True
+
+    udata = {
+        'username': u['username'],
+        'description': u['data']['description'],
+        'avatar': f'{session["config"]["cdn_url"]}/avatars/{u["username"]}',
+        'registered_in': u['registered_in'],
+        'data': u['data'],
+        'hasAvatar': hasAvatar,
+    }
+
+    if u.get('isVerified') == True:
+        udata['isVerified'] = True
+    if u.get('isDonator') == True:
+        udata['isDonator'] = True
+    
+    return render_template(f'themes/{theme}.html', session=session, udata=udata)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -327,6 +438,7 @@ def register():
             'discover',
             'tos',
             'termsofservice',
+            'statics'
         ]
 
         if users.count_documents({'email': email}) != 0:
@@ -429,6 +541,9 @@ def login():
             session['email'] = user['email']
             session['data'] = user['data']
 
+            if user.get('isDonator') == True:
+                session['isDonator'] = True
+
             if isinstance(user['avatar'], dict):
                 session['isAvatar'] = True
             else:
@@ -462,7 +577,9 @@ def discover():
 
     verified_users = clean_discover_data(list(users.find({'isVerified': True})))
 
-    return render_template('discover.html', users_data=cleaned_data, verified_users=verified_users, session=session)
+    donators = clean_discover_data(list(users.find({'isDonator': True})))
+
+    return render_template('discover.html', users_data=cleaned_data, verified_users=verified_users, donators=donators, session=session)
 
 @app.route('/tos')
 def tos():
@@ -547,6 +664,13 @@ def user(username):
 
     increment_visits(username)
 
+    if u['data']['theme'] == 'custom':
+        return render_template('themes/custom_theme.html',
+        session=session,
+        udata=udata,
+        main_color=u.get('main_color'),
+        background_color=u.get('background_color'),
+        text_color=u.get('text_color'))
     if u['data']['theme'] == 'linksbase':
         return render_template('themes/linksbase_main_theme.html', session=session, udata=udata)
     if u['data']['theme'] == 'light':
@@ -559,6 +683,8 @@ def user(username):
         return render_template('themes/blue_theme.html', session=session, udata=udata)
     if u['data']['theme'] == 'red':
         return render_template('themes/red_theme.html', session=session, udata=udata)
+    if u['data']['theme'] == 'dark_blue':
+        return render_template('themes/dark_blue_theme.html', session=session, udata=udata)
 
     # account does not exist
     return abort(404)
