@@ -154,6 +154,18 @@ def set_donator_panel():
         }
     })
 
+    main_color = '#d90429'
+    background_color = '#edf2f4'
+    text_color = '#293241'
+
+    users.update_one({'username': session.get('username')}, {
+        '$set': {
+            'main_color': main_color,
+            'background_color': background_color,
+            'text_color': text_color
+        }
+    })
+
     return redirect('/')
 
 @app.route('/unset_donator', methods=['GET', 'POST'])
