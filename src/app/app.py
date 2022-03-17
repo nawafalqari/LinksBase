@@ -367,7 +367,7 @@ def save_custom_theme():
     
     u = users.find_one({'username': session.get('username')})
     if not u.get('isDonator') == True:
-        return render_template('logged_in.html', msg='Custom themes are only for donators', msg_type='danger')
+        return redirect(url_for('index', msg='Custom themes are only for donators', msg_type='danger'))
 
     main_color = request.form.get('main_color')
     background_color = request.form.get('background_color')

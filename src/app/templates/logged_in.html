@@ -143,10 +143,6 @@
       color: white;
     }
 
-    a:has(.submit) {
-      color: red !important;
-    }
-
     form {
       margin-top: 10px;
     }
@@ -292,6 +288,7 @@
 
     .become-donator:hover {
       text-decoration: none;
+		color: inherit;
     }
   </style>
   <nav class="navbar navbar-expand-lg">
@@ -586,7 +583,7 @@
         {% if session.get('isDonator') == True %}
         <button type="submit" class="form-control submit">Save Custom Theme</button>
         {% else %}
-        <a href="https://www.patreon.com/nawafalqari" class="become-donator"><button class="form-control submit">Become a donator</button></a>
+        <a target="_blank" href="https://www.patreon.com/nawafalqari" class="become-donator form-control submit" style="text-align:center;">Become a donator</a>
         {% endif %}
       </div>
     </form>
