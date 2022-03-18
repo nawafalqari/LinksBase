@@ -661,6 +661,8 @@ def user(username):
         udata['isVerified'] = True
     if u.get('isDonator') == True:
         udata['isDonator'] = True
+    if u.get('isEvexsLandStaff') == True:
+        udata['isEvexsLandStaff'] = True
 
     increment_visits(username)
 

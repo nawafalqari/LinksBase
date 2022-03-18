@@ -91,9 +91,13 @@
     </div>
     <div class="text">
       <h1>
+        {% if user.get('isEvexsLandStaff') %}
+        <img src="{{ session['config']['cdn_url'] }}/media/evexs.png" alt="EvexsLand"
+          style="width: 30px;height: 30px;margin: 0 5px 0 0px;" loading="lazy" title="EvexsLand Staff Badge">
+        {% endif %}
         {% if udata['isDonator'] %}
-        <img src="{{ session['config']['cdn_url'] }}/media/donator.png" alt="Donator Badge"
-          title="Donator Badge" style="width: 30px;height: 30px;">
+        <img src="{{ session['config']['cdn_url'] }}/media/donator.png" alt="Donator Badge" title="Donator Badge"
+          style="width: 30px;height: 30px;">
         {% endif %}
         {% if udata['isVerified'] %}
         <img src="{{ session['config']['cdn_url'] }}/media/verified_gold.png" alt="Verified Badge"
