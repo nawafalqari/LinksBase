@@ -34,6 +34,8 @@ def user_data(username):
     del u['password']
     del u['email']
     del u['_id']
+    del u['visits_monthly']
+    del u['visits_weekly']
     u['avatar'] = f'https://cdn.linksb.me/avatars/{username}'
     u['qr_code'] = f'https://cdn.linksb.me/qrcodes/{username}'
     return jsonify({
@@ -58,17 +60,13 @@ def qrcode_data(username):
             '_error': True,
             '_error_message': f'User {username} not found'
         })
-    del u['password']
-    del u['email']
-    del u['_id']
-    del u['avatar']
-    del u['data']
-    del u['registered_in']
-    u['qr_code'] = f'https://cdn.linksb.me/qrcodes/{username}'
+
+    d = {}
+    d['qr_code'] = f'https://cdn.linksb.me/qrcodes/{username}'
     return jsonify({
         '_error': False,
         '_error_message': '',
-        **u
+        **d
     })
 
 @app.route('/avatar/')

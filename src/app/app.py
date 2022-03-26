@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect, session, abort
+from flask import Flask, render_template, url_for, request, redirect, session, abort, send_file
 from flask_pymongo import PyMongo
 from random import sample
 from pymongo import MongoClient
@@ -633,6 +633,14 @@ def statics():
     weekly_labels=weekly_labels,
     weekly_values=weekly_values,
     session=session)
+
+@app.route('/apple-touch-icon.png')
+def apple_touch_icon():
+    return send_file('static/no_circle.png')
+
+@app.route('/apple-touch-icon-120x120-precomposed.png')
+def apple_touch_icon_2():
+    return send_file('static/no_circle.png')
 
 @app.route('/<username>')
 def user(username):
