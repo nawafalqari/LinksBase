@@ -228,7 +228,16 @@ def index():
         tiktok = request.form.get('tiktok')
         twitch = request.form.get('twitch')
         other = request.form.get('other')
+
+        github = request.form.get('github')
+        paypal = request.form.get('paypal')
+        patreon = request.form.get('patreon')
+        discord = request.form.get('discord')
+        email = request.form.get('email')
+
         theme = request.form.get('theme')
+
+        inputs = [(youtube, 'YouTube'), (twitter, 'Twitter'), (instagram, 'Instagram'), (tiktok, 'TikTok'), (twitch, 'Twitch'), (other, 'Other'), (github, 'Github'), (paypal, 'PayPal'), (patreon, 'Patreon'), (discord, 'Discord'), (email, 'Email')]
 
         user = users.find_one({'username': session.get('username')})
 
@@ -252,7 +261,12 @@ def index():
                                        ig=instagram,
                                        tk=tiktok,
                                        ttv=twitch,
-                                       ot=other)
+                                       ot=other,
+                                       github=github,
+                                       paypal=paypal,
+                                       patreon=patreon,
+                                       discord=discord,
+                                       email=email)
 
             if avatar_extension not in extensions:
                 return render_template('logged_in.html',
@@ -265,7 +279,12 @@ def index():
                                        ig=instagram,
                                        tk=tiktok,
                                        ttv=twitch,
-                                       ot=other)
+                                       ot=other,
+                                       github=github,
+                                       paypal=paypal,
+                                       patreon=patreon,
+                                       discord=discord,
+                                       email=email)
 
             users.update_one(user, {
                 '$set': {'avatar': {
@@ -275,15 +294,31 @@ def index():
                 }}
             })
 
-        if (not validators.url(youtube) and (youtube != 'https://' and youtube != '')) or \
-            (not validators.url(twitter) and (twitter != 'https://' and twitter != '')) or \
-            (not validators.url(instagram) and (instagram != 'https://' and instagram != '')) or \
-            (not validators.url(tiktok) and (tiktok != 'https://' and tiktok != '')) or \
-            (not validators.url(twitch) and (twitch != 'https://' and twitch != '')) or \
-                (not validators.url(other) and (other != 'https://' and other != '')):
-            return render_template('logged_in.html',
+        for url in inputs:
+            if url[1] == 'Email':
+                print(validators.email(url[0]))
+                if (not validators.email(url[0]) and (url[0] != '')):
+                    return render_template('logged_in.html',
+                                    session=session,
+                                    msg=f'Invalid Email, Field: {url[1]}',
+                                    msg_type='danger',
+                                    dc=description,
+                                    yt=youtube,
+                                    tt=twitter,
+                                    ig=instagram,
+                                    tk=tiktok,
+                                    ttv=twitch,
+                                    ot=other,
+                                    github=github,
+                                    paypal=paypal,
+                                    patreon=patreon,
+                                    discord=discord,
+                                    email=email)
+
+            elif (not validators.url(url[0]) and (url[0] != '')):
+                return render_template('logged_in.html',
                                    session=session,
-                                   msg='Something went wrong, make sure every url is right!',
+                                   msg=f'Invalid URL, website: {url[1]}',
                                    msg_type='danger',
                                    dc=description,
                                    yt=youtube,
@@ -291,9 +326,34 @@ def index():
                                    ig=instagram,
                                    tk=tiktok,
                                    ttv=twitch,
-                                   ot=other)
+                                   ot=other,
+                                   github=github,
+                                   paypal=paypal,
+                                   patreon=patreon,
+                                   discord=discord,
+                                   email=email)
         
         user = users.find_one({'username': session.get('username')})
+        
+        data = {
+            'youtube': youtube,
+            'twitter': twitter,
+            'instagram': instagram,
+            'tiktok': tiktok,
+            'twitch': twitch,
+            'other': other,
+        }
+
+        if github:
+            data['github'] = github
+        if paypal:
+            data['paypal'] = paypal
+        if patreon:
+            data['patreon'] = patreon
+        if discord:
+            data['discord'] = discord
+        if email:
+            data['email'] = email
 
         users.update_one(user, {
             '$set': {
@@ -301,12 +361,7 @@ def index():
                     'url': user['data']['url'],
                     'description': description,
                     'theme': theme,
-                    'youtube': youtube,
-                    'twitter': twitter,
-                    'instagram': instagram,
-                    'tiktok': tiktok,
-                    'twitch': twitch,
-                    'other': other,
+                    **data
                 }
             }
         })
@@ -655,6 +710,8 @@ def user(username):
     hasAvatar = False
     if not (u.get('avatar') == 'noavatar.png'):
         hasAvatar = True
+
+    accounts = []
 
     udata = {
         'username': u['username'],

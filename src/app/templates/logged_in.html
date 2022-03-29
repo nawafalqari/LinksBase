@@ -171,6 +171,7 @@
       color: white;
       padding: 5px;
       width: 100%;
+      cursor: pointer;
     }
 
     select:focus {
@@ -220,7 +221,7 @@
     }
 
     /* Custom theme styling */
-    .custom-theme-container > label {
+    .custom-theme-container>label {
       display: flex;
       align-items: center;
     }
@@ -273,6 +274,7 @@
       border-radius: 15px;
       border: none;
     }
+
     .color-container input[type="color"]::-moz-color-swatch {
       border-radius: 15px;
       border: none;
@@ -282,15 +284,124 @@
       opacity: 40%;
     }
 
-    .color-container input[type="color"]:disabled + label {
+    .color-container input[type="color"]:disabled+label {
       opacity: 40%;
     }
 
     .become-donator:hover {
       text-decoration: none;
-		color: inherit;
+      color: inherit;
+    }
+
+    .ocw-container {
+      width: 100%;
+      position: relative;
+    }
+
+    .ocw-container #open-close-websites {
+      width: 30px;
+      height: 30px;
+      background-color: #007bff;
+      text-align: center;
+      position: absolute;
+      right: 0;
+      bottom: -30px;
+      cursor: pointer;
+      border-radius: 0 0 10px 10px;
+    }
+
+    #websites-modal {
+      color: black;
+    }
+
+    #websites-modal input#close-modal {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+
+    .websites-table {
+      border-collapse: collapse;
+      width: 100%;
+      border: 3px solid #007bff;
+      color: #000000;
+      width: 100%
+    }
+
+    .websites-table i {
+      font-size: 35px;
+      color: #007bff;
+      transition: .3s;
+      cursor: pointer;
+    }
+
+    .websites-table i:hover {
+      color: #0659b3;
     }
   </style>
+  <!-- <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="modal fade" id="websites-modal">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3>Add More Websites</h3>
+              </div>
+              <div class="modal-body">
+                <p>Choose websites to add in your <b><a href="{{ session['data']['url'] }}" target="_blank">Page</a></b>
+                </p>
+                <table class="websites-table" cellpadding="5" cellspacing="3" border="5px">
+
+                  {% if not session['data']['github'] %}
+                  <tr>
+                    <td style="width: 0px">
+                      <a href="https://github.com"><i class="fab fa-github"></i></a>
+                    </td>
+                    <td>
+                      {% if github %}
+                      <input type="text" value="{{ yt }}" class="data-inp" name="github">
+                      {% else %}
+                      <input type="text" value="{{ session['data']['github'] or '' }}" class="data-inp"
+                        name="github">
+                      {% endif %}
+                    </td>
+                    <td style="width: 0px;">
+                      <i class="fas fa-plus" class="tools" data-website="github" id="add-button"></i>
+                    </td>
+                  </tr>
+                  {% endif %}
+
+                  {% if not session['data']['paypal'] %}
+                  <tr>
+                    <td style="width: 0px">
+                      <a href="https://paypal.com"><i class="fab fa-paypal"></i></a>
+                    </td>
+                    <td>
+                      {% if paypal %}
+                      <input type="text" value="{{ paypal }}">
+                      {% else %}
+                      <input type="text" value="{{ session['data']['paypal'] or '' }}" class="data-inp"
+                        name="paypal">
+                      {% endif %}
+                    </td>
+                    <td style="width: 0px;">
+                      <i class="fas fa-plus" class="tools" data-website="paypal" id="add-button"></i>
+                    </td>
+                  </tr>
+                  {% endif %}
+
+                </table>
+              </div>
+              <div class="modal-footer">
+                <input class="btn btn-default" data-dismiss="modal" value="Done" id="close-modal">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
   <nav class="navbar navbar-expand-lg">
     <a href="{{ url_for('index') }}" class="navbar-brand"><img
         src="{{ session['config']['cdn_url'] }}/media/transparent_full_width.png" alt="logo-transparent"></a>
@@ -351,6 +462,104 @@
           name="description" maxlength="100" autofocus>
         {% endif %}
       </div>
+
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="modal fade" id="websites-modal">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h3>Add More Websites</h3>
+                </div>
+                <div class="modal-body">
+                  <p><small>If you leave a website empty it won't show in your <b><a href="{{ session['data']['url'] }}"
+                    target="_blank">Page</a></b></small></p>
+                  </p>
+                  <table class="websites-table" cellpadding="5" cellspacing="3" border="5px">
+
+                    <tr>
+                      <td style="width: 0px">
+                        <a href="https://github.com" title="Github"><i class="fab fa-github"></i></a>
+                      </td>
+                      <td>
+                        {% if github %}
+                        <input type="text" value="{{ github }}" class="data-inp" name="github" placeholder="https://">
+                        {% else %}
+                        <input type="text" value="{{ session['data']['github'] or '' }}" class="data-inp"
+                          name="github" placeholder="https://">
+                        {% endif %}
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="width: 0px">
+                        <a href="https://paypal.com" title="PayPal"><i class="fab fa-paypal"></i></a>
+                      </td>
+                      <td>
+                        {% if paypal %}
+                        <input type="text" value="{{ paypal }}" class="data-inp" name="paypal" placeholder="https://">
+                        {% else %}
+                        <input type="text" value="{{ session['data']['paypal'] or '' }}" class="data-inp"
+                          name="paypal" placeholder="https://">
+                        {% endif %}
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="width: 0px">
+                        <a href="https://patreon.com/" title="Patreon"><i class="fab fa-patreon"></i></a>
+                      </td>
+                      <td>
+                        {% if patreon %}
+                        <input type="text" value="{{ patreon }}" class="data-inp" name="patreon" placeholder="https://">
+                        {% else %}
+                        <input type="text" value="{{ session['data']['patreon'] or '' }}" class="data-inp"
+                          name="patreon" placeholder="https://">
+                        {% endif %}
+                      </td>
+                    </tr>
+                    
+                    <tr>
+                      <td style="width: 0px">
+                        <a href="https://discord.com" title="discord"><i class="fab fa-discord"></i></a>
+                      </td>
+                      <td>
+                        {% if discord %}
+                        <input type="text" value="{{ discord }}" class="data-inp" name="discord" placeholder="https://">
+                        {% else %}
+                        <input type="text" value="{{ session['data']['discord'] or '' }}" class="data-inp"
+                          name="discord" placeholder="https://">
+                        {% endif %}
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="width: 0px">
+                        <a href="" title="Email"><i class="fas fa-envelope"></i></a>
+                      </td>
+                      <td>
+                        {% if email %}
+                        <input type="text" value="{{ email }}" class="data-inp" name="email" placeholder="name@domain.com">
+                        {% else %}
+                        <input type="text" value="{{ session['data']['email'] or '' }}" class="data-inp"
+                          name="email" placeholder="name@domain.com">
+                        {% endif %}
+                      </td>
+                    </tr>
+
+                  </table>
+                </div>
+                <div class="modal-footer">
+                  <input class="btn btn-default" data-dismiss="modal" value="Done" id="close-modal">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
       <table border="1"
         style="background-color:white; border-collapse:collapse; border:3px solid #007bff; color:#000000; width:100%"
         cellpadding="5" cellspacing="3">
@@ -362,9 +571,9 @@
           </td>
           <td>
             {% if yt %}
-            <input type="text" value="{{ yt }}" class="data-inp" name="youtube">
+            <input type="text" value="{{ yt }}" class="data-inp" name="youtube" placeholder="https://">
             {% else %}
-            <input type="text" value="{{ session['data']['youtube'] or 'https://' }}" class="data-inp" name="youtube">
+            <input type="text" value="{{ session['data']['youtube'] or '' }}" class="data-inp" name="youtube" placeholder="https://">
             {% endif %}
           </td>
         </tr>
@@ -376,9 +585,9 @@
           </td>
           <td>
             {% if tt %}
-            <input type="text" value="{{ tt }}" class="data-inp" name="twitter">
+            <input type="text" value="{{ tt }}" class="data-inp" name="twitter" placeholder="https://">
             {% else %}
-            <input type="text" value="{{ session['data']['twitter'] or 'https://' }}" class="data-inp" name="twitter">
+            <input type="text" value="{{ session['data']['twitter'] or '' }}" class="data-inp" name="twitter" placeholder="https://">
             {% endif %}
           </td>
         </tr>
@@ -390,10 +599,10 @@
           </td>
           <td>
             {% if ig %}
-            <input type="text" value="{{ ig }}" class="data-inp" name="instagram">
+            <input type="text" value="{{ ig }}" class="data-inp" name="instagram" placeholder="https://">
             {% else %}
-            <input type="text" value="{{ session['data']['instagram'] or 'https://' }}" class="data-inp"
-              name="instagram">
+            <input type="text" value="{{ session['data']['instagram'] or '' }}" class="data-inp"
+              name="instagram" placeholder="https://">
             {% endif %}
           </td>
         </tr>
@@ -410,9 +619,9 @@
           </td>
           <td>
             {% if tk %}
-            <input type="text" value="{{ tk }}" class="data-inp" name="tiktok">
+            <input type="text" value="{{ tk }}" class="data-inp" name="tiktok" placeholder="https://">
             {% else %}
-            <input type="text" value="{{ session['data']['tiktok'] or 'https://' }}" class="data-inp" name="tiktok">
+            <input type="text" value="{{ session['data']['tiktok'] or '' }}" class="data-inp" name="tiktok" placeholder="https://">
             {% endif %}
           </td>
         </tr>
@@ -424,9 +633,9 @@
           </td>
           <td>
             {% if ttv %}
-            <input type="text" value="{{ ttv }}" class="data-inp" name="twitch">
+            <input type="text" value="{{ ttv }}" class="data-inp" name="twitch" placeholder="https://">
             {% else %}
-            <input type="text" value="{{ session['data']['twitch'] or 'https://' }}" class="data-inp" name="twitch">
+            <input type="text" value="{{ session['data']['twitch'] or '' }}" class="data-inp" name="twitch" placeholder="https://">
             {% endif %}
           </td>
         </tr>
@@ -456,13 +665,16 @@
           </td>
           <td>
             {% if dc %}
-            <input type="text" value="{{ ot }}" class="data-inp" name="other">
+            <input type="text" value="{{ ot }}" class="data-inp" name="other" placeholder="https://">
             {% else %}
-            <input type="text" value="{{ session['data']['other'] or 'https://' }}" class="data-inp" name="other">
+            <input type="text" value="{{ session['data']['other'] or '' }}" class="data-inp" name="other" placeholder="https://">
             {% endif %}
           </td>
         </tr>
       </table>
+      <div class="ocw-container">
+        <div id="open-close-websites"><b>+</b></div>
+      </div>
       <span><small>Leave URL empty if you want to remove it</small></span>
       <div class="" style="margin-top: 1rem;">
         <select name="theme" class="form-select form-select-lg mb-3" id="theme-select"
@@ -524,13 +736,13 @@
           <!-- donators custom theme -->
 
           {% if session.get('isDonator') == True %}
-            {% if session['data']['theme'] == 'custom' %}
-            <option selected value="custom">Custom Theme</option>
-            {% else %}
-            <option value="custom">Custom Theme</option>
-            {% endif %}
+          {% if session['data']['theme'] == 'custom' %}
+          <option selected value="custom">Custom Theme</option>
           {% else %}
-            <option value="custom" disabled>Custom Theme</option>
+          <option value="custom">Custom Theme</option>
+          {% endif %}
+          {% else %}
+          <option value="custom" disabled>Custom Theme</option>
           {% endif %}
         </select>
       </div>
@@ -562,9 +774,11 @@
             </div>
             <div class="color-container">
               {% if session.get('isDonator') == True %}
-              <input type="color" name="background_color" title="Background Color" value="{{ background_color or '#edf2f4' }}">
+              <input type="color" name="background_color" title="Background Color"
+                value="{{ background_color or '#edf2f4' }}">
               {% else %}
-              <input type="color" name="background_color" title="Background Color" value="{{ background_color or '#edf2f4' }}" disabled>
+              <input type="color" name="background_color" title="Background Color"
+                value="{{ background_color or '#edf2f4' }}" disabled>
               {% endif %}
               <label for="backgournd_color">Background Color</label>
             </div>
@@ -583,7 +797,8 @@
         {% if session.get('isDonator') == True %}
         <button type="submit" class="form-control submit">Save Custom Theme</button>
         {% else %}
-        <a target="_blank" href="https://www.patreon.com/nawafalqari" class="become-donator form-control submit" style="text-align:center;">Become a donator</a>
+        <a target="_blank" href="https://www.patreon.com/nawafalqari" class="become-donator form-control submit"
+          style="text-align:center;">Become a donator</a>
         {% endif %}
       </div>
     </form>
@@ -649,6 +864,15 @@
   */
   window.history.pushState("object or string", "Title", "/" + window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]);
 
+  $('#open-close-websites').on('click', function (e) {
+    $('#websites-modal').modal('show')
+  })
+
+  $('#close-modal').on('click', function (e) {
+    console.log(true)
+    $('#websites-modal').modal('hide')
+  })
+
   var loadFile = function (event) {
     var output = document.getElementById('avatar');
     output.src = URL.createObjectURL(event.target.files[0]);
@@ -664,29 +888,5 @@
       },
       5000)
   }
-
-  $('.form').on('submit', (e) => {
-    $.ajax({
-      type: 'POST',
-      url: '/',
-      data: {
-        description: $('input[name="description"]'),
-
-        youtube: $('input[name="youtube"]'),
-        twitter: $('input[name="twitter"]'),
-        instagram: $('input[name="instagram"]'),
-        tiktok: $('input[name="tiktok"]'),
-        twitch: $('input[name="twitch"]'),
-        other: $('input[name="other"]'),
-      },
-      success: () => {
-
-      },
-      error: () => {
-
-      }
-    })
-    e.preventDefault()
-  })
 </script>
 {% endblock %}
