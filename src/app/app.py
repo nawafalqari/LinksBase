@@ -296,7 +296,6 @@ def index():
 
         for url in inputs:
             if url[1] == 'Email':
-                print(validators.email(url[0]))
                 if (not validators.email(url[0]) and (url[0] != '')):
                     return render_template('logged_in.html',
                                     session=session,
@@ -721,6 +720,12 @@ def user(username):
         'data': u['data'],
         'hasAvatar': hasAvatar,
     }
+
+    are_all_empty = list(udata['data'].values())
+    are_all_empty = all(ele == are_all_empty[0] for ele in are_all_empty)
+
+    if are_all_empty == True:
+        udata['all_empty'] = True
 
     if u.get('isVerified') == True:
         udata['isVerified'] = True
