@@ -1,5 +1,6 @@
 from flask import Flask, render_template, url_for, request, redirect, session, abort, send_file
 from flask_pymongo import PyMongo
+from flask_minify import minify
 from random import sample
 from pymongo import MongoClient
 from bcrypt import hashpw, checkpw, gensalt
@@ -12,16 +13,15 @@ from PIL import Image
 import qrcode
 from mimetypes import MimeTypes
 import calendar
-from time import time
-from threading import Thread
-from time import sleep
-from collections import OrderedDict
+
 
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv('APP_SECRET_KEY')
 app.config['MONGO_URI'] = os.getenv('MONGO_URI')
+
+minify(app, html=True, js=True, cssless=True, fail_safe=True)
 
 images_client = PyMongo(app)
 
