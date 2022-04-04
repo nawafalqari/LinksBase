@@ -1,5 +1,4 @@
 from flask import Flask, render_template, url_for, request, redirect, session, abort, send_file
-from flask_pymongo import PyMongo
 from flask_minify import minify
 from random import sample
 from pymongo import MongoClient
@@ -14,7 +13,6 @@ import qrcode
 from mimetypes import MimeTypes
 import calendar
 
-
 load_dotenv()
 
 app = Flask(__name__)
@@ -23,24 +21,10 @@ app.config['MONGO_URI'] = os.getenv('MONGO_URI')
 
 minify(app, html=True, js=True, cssless=True, fail_safe=True)
 
-images_client = PyMongo(app)
-
 mongodb_connection_url = os.getenv('MONGO_URI')
 client = MongoClient(mongodb_connection_url)
 users = client.linksbase.users
 sysconf = client.linksbase['System configurations']
-
-# def gen_code():
-#     numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9',
-#                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
-#     code = sample(numbers, 18)
-#     codes = sysconf.find_one({
-#         '_id': ObjectId('62016109f996a323ddddeda3'),
-#         'type': 'sc'
-#     })['avatar_ids']
-#     if code in codes:
-#         gen_code()
-#     return ''.join(code)
 
 def normal_gen_code():
     numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -180,6 +164,28 @@ def increment_visits(username):
         }
     })
     return True
+
+def discover_users():
+    users_length = users.count_documents({})
+    wanted_number_of_users = users_length
+
+    users_data = users.find({}, skip=(users_length - wanted_number_of_users))
+    users_data = list(reversed(list(users_data)))
+    cleaned_data = clean_discover_data(users_data)
+
+    return cleaned_data
+
+def discover_verified_users():
+    verified_users = users.find({'isVerified': True})
+    verified_users = clean_discover_data(list(verified_users))
+
+    return verified_users
+
+def discover_donators():
+    donators = users.find({'isDonator': True})
+    donators = clean_discover_data(list(donators))
+
+    return donators
 
 # today = datetime.datetime.now()
 # todaysFormat = [f'{today.month}-{today.day}-{today.year}']
@@ -623,17 +629,14 @@ def logout():
 def discover():
     session['config'] = {}
     session['config']['cdn_url'] = os.getenv('CDN_URL')
+    
+    users_data = discover_users()
 
-    users_length = users.count_documents({})
-    wanted_number_of_users = users_length
-    users_data = list(reversed(list(users.find({}, skip=(users_length - wanted_number_of_users)))))
-    cleaned_data = clean_discover_data(users_data)
+    verified_users = discover_verified_users()
 
-    verified_users = clean_discover_data(list(users.find({'isVerified': True})))
+    donators = discover_donators()
 
-    donators = clean_discover_data(list(users.find({'isDonator': True})))
-
-    return render_template('discover.html', users_data=cleaned_data, verified_users=verified_users, donators=donators, session=session)
+    return render_template('discover.html', users_data=users_data, verified_users=verified_users, donators=donators, session=session)
 
 @app.route('/tos')
 def tos():
@@ -710,8 +713,6 @@ def user(username):
     if not (u.get('avatar') == 'noavatar.png'):
         hasAvatar = True
 
-    accounts = []
-
     udata = {
         'username': u['username'],
         'description': u['data']['description'],
@@ -760,6 +761,3 @@ def user(username):
 
     # account does not exist
     return abort(404)
-
-if __name__ == '__main__':
-    app.run(debug=True)
